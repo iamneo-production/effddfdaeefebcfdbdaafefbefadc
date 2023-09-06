@@ -1,0 +1,106 @@
+@model OrderViewModel
+<head>
+    <style>
+        .status-counts {
+            margin-bottom: 20px;
+        }
+
+        .status-label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .status-value {
+            font-weight: normal;
+            color: white; /* Change this to your desired color */
+        }
+
+        /* Add space between status labels and values */
+        .status-label,
+        .status-value {
+            margin-bottom: 10px; /* Adjust as needed */
+        }
+    </style>
+</head>
+
+
+    <div class="center-align">
+ <h1 class="mb-4" style="color: darkviolet;">Orders Ready to Delivery</h1>
+ </div>
+ <div class="container mt-5">
+    <div class="status-counts">
+        <h4>
+            <span class="status-label">Pending:</span> <span class="status-value badge bg-secondary">@Model.PendingCount</span>
+            <span class="status-label">Delivered:</span> <span class="status-value badge bg-success">@Model.DeliveredCount</span>
+            <span class="status-label">Out for Delivery:</span> <span class="status-value badge bg-warning text-dark">@Model.OutForDeliveryCount</span>
+            <span class="status-label">In Transit:</span> <span class="status-value badge bg-info">@Model.InTransitCount</span>
+        </h4>
+    </div>
+
+    @if (Model.Orders.Any())
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Customer Name</th>
+                    <th>Contact Number</th>
+                    <th>Location</th>
+                    <th>Amount</th>
+                    <th>Delivery Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.Orders)
+                {
+                    <tr>
+                        <td>@order.CustomerName</td>
+                        <td>@order.ContactNumber</td>
+                        <td>@order.Location</td>
+                        <td>@order.Amount</td>
+                        <td>
+                            @Html.DropDownList("OrderStatus", new List<SelectListItem>
+                            {
+                                new SelectListItem{ Text="Pending", Value = "Pending", Selected = (order.delivery.Status == "Pending") },
+                                new SelectListItem{ Text="Delivered", Value = "Delivered", Selected = (order.delivery.Status == "Delivered") },
+                                new SelectListItem{ Text="Out for Delivery", Value = "Out for Delivery", Selected = (order.delivery.Status == "Out for Delivery") },
+                                new SelectListItem{ Text="In Transit", Value = "In Transit", Selected = (order.delivery.Status == "In Transit") }
+                            },
+                            new { @class="form-control order-status", data_orderid = order.OrderId, onchange="updateDeliveryStatus(this)" })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No Orders have been booked.</p>
+    }
+
+    <a asp-controller="Order" asp-action="OrderForm" class="btn btn-primary">Add Order</a>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function updateDeliveryStatus(dropdown) {
+        var selectedStatus = dropdown.value;
+       var orderId = dropdown.getAttribute('data-orderid'); // Assuming you have an attribute to store the order ID in the <tr>
+console.log(orderId+" value");
+        // Send the selected status and order ID to the server
+        $.ajax({
+            type: 'POST',
+            url: '/Delivery/UpdateStatus',
+            data: { orderId: orderId, selectedStatus: selectedStatus },
+            success: function (response) {
+                if (response.success) {
+                    dropdown.value = selectedStatus;
+                    location.reload();
+                } else {
+                    console.log('Update failed.');
+                }
+                },
+            error: function (error) {
+                console.error(error);
+            }
+        });
+    }
+</script>

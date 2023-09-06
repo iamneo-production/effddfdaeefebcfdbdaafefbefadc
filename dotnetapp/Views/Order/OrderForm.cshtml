@@ -1,0 +1,26 @@
+@model Order
+ <div class="center-align">
+    <h1 class="mb-4" style="color: darkviolet;">Order Form</h1>
+    <div class="text-right">
+        <a asp-controller="Delivery" asp-action="CheckOrders" class="btn btn-secondary">View All Deliveries</a>
+    </div>
+</div>
+<form method="post">
+    <div class="form-group">
+        <label for="cus_name">Customer Name:</label>
+        <input type="text" id="cus_name" name="cus_name" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label for="cus_number">Contact Number:</label>
+        <input type="text" id="cus_number" name="cus_number" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label for="amount">Amount:</label>
+        <input type="number" id="amount" name="amount" class="form-control" required>
+    </div>
+    <button type="submit" class="btn btn-primary">SUBMIT</button>
+</form>
